@@ -11,140 +11,133 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
-      min-height: 100vh;
-      text-align: center;
+      padding: 40px;
     }
+
     h1 {
       color: #00adb5;
       margin-bottom: 10px;
     }
+
     .stats {
-      font-size: 1.2em;
-      margin: 20px 0;
+      font-size: 18px;
+      margin-bottom: 20px;
     }
-    .stats span {
-      margin: 0 10px;
-    }
-    .btn {
+
+    button {
       background-color: #00adb5;
-      color: white;
+      color: #fff;
       border: none;
-      padding: 12px 20px;
-      border-radius: 5px;
-      font-size: 16px;
+      padding: 10px 20px;
+      margin: 15px 0;
+      border-radius: 8px;
       cursor: pointer;
-      margin-top: 20px;
-      transition: background 0.2s;
+      font-size: 16px;
+      transition: background-color 0.2s;
     }
-    .btn:hover {
-      background-color: #0199a2;
+
+    button:hover {
+      background-color: #00989f;
     }
-    #copyNotice {
-      margin-top: 10px;
+
+    #notification {
       color: #4caf50;
-      font-size: 0.9em;
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      margin-top: 10px;
+      display: none;
+      animation: fade 2s ease-out forwards;
     }
-    #qrcode {
-      margin-top: 30px;
+
+    @keyframes fade {
+      0% { opacity: 1; }
+      100% { opacity: 0; display: none; }
     }
   </style>
 </head>
 <body>
 
-  <h1>Shadowsocks Панель</h1>
-  <div class="stats">
-    <span>Всего: <strong id="total">0</strong></span>
-    <span>🟢 Онлайн: <strong id="online">0</strong></span>
-    <span>🔴 Оффлайн: <strong id="offline">0</strong></span>
-  </div>
-  <button class="btn" onclick="copySubscription()">Скопировать подписку</button>
-  <div id="copyNotice">Ссылка скопирована!</div>
-  <div id="qrcode"></div>
+  <h1>Shadowsocks Серверы</h1>
+  <div class="stats" id="serverStats">Загрузка...</div>
+  <canvas id="qrcode"></canvas>
+  <button onclick="copySubscription()">Скопировать подписку</button>
+  <div id="notification">Ссылка скопирована!</div>
 
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script>
     const subscriptionURL = "https://kiryascript.github.io/FUCK_RKN/subscription.txt";
+    const statsDiv = document.getElementById("serverStats");
+    const notification = document.getElementById("notification");
 
-    function copySubscription() {
-      navigator.clipboard.writeText(subscriptionURL).then(() => {
-        const notice = document.getElementById("copyNotice");
-        notice.style.opacity = 1;
-        setTimeout(() => notice.style.opacity = 0, 2000);
-      });
-    }
+    let total = 0, online = 0, offline = 0;
 
-    function parseSSLinks(text) {
-      return text
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.startsWith("ss://"));
+    function updateStats() {
+      statsDiv.textContent = `Всего: ${total} | 🟢 Онлайн: ${online} | 🔴 Оффлайн: ${offline}`;
     }
 
     function extractIpPort(ssLink) {
       try {
-        const main = ssLink.replace("ss://", "").split("#")[0];
-        const decoded = atob(main);
-        const address = decoded.split("@")[1];
-        const [ip, port] = address.split(":");
+        const raw = ssLink.replace("ss://", "").split("#")[0];
+        const decoded = atob(raw);
+        const [ , addr ] = decoded.split("@");
+        const [ip, port] = addr.split(":");
         return { ip, port };
       } catch {
         return { ip: "", port: "" };
       }
     }
 
-    function checkStatus(ip, port, callback) {
-      const img = new Image();
-      img.onload = () => callback(true);
-      img.onerror = () => callback(false);
-      img.src = `http://${ip}:${port}/favicon.ico?${Date.now()}`;
-      setTimeout(() => callback(false), 2000);
+    function checkOnline(ip, port) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = `http://${ip}:${port}/favicon.ico?${Date.now()}`;
+        setTimeout(() => resolve(false), 2000);
+      });
     }
 
     async function loadServers() {
       try {
-        const response = await fetch("servers.txt");
-        const text = await response.text();
-        const links = parseSSLinks(text);
-        document.getElementById("total").textContent = links.length;
+        const res = await fetch("servers.txt");
+        const text = await res.text();
+        const lines = text.split("\n").map(l => l.trim()).filter(l => l.startsWith("ss://"));
+        total = lines.length;
 
-        let online = 0;
-        let checked = 0;
-
-        if (links.length === 0) return;
-
-        links.forEach(link => {
-          const { ip, port } = extractIpPort(link);
+        for (const ss of lines) {
+          const { ip, port } = extractIpPort(ss);
           if (ip && port) {
-            checkStatus(ip, port, isOnline => {
-              checked++;
-              if (isOnline) online++;
-              if (checked === links.length) {
-                document.getElementById("online").textContent = online;
-                document.getElementById("offline").textContent = links.length - online;
-              }
-            });
+            const isOnline = await checkOnline(ip, port);
+            if (isOnline) online++;
+            else offline++;
+            updateStats();
           } else {
-            checked++;
-            if (checked === links.length) {
-              document.getElementById("online").textContent = online;
-              document.getElementById("offline").textContent = links.length - online;
-            }
+            offline++;
+            updateStats();
           }
-        });
+        }
 
-      } catch (err) {
-        console.error("Ошибка загрузки servers.txt", err);
+      } catch (e) {
+        statsDiv.textContent = "Не удалось загрузить servers.txt";
+        console.error("Ошибка загрузки:", e);
       }
     }
 
-    // Генерация QR-кода
-    QRCode.toCanvas(document.getElementById("qrcode"), subscriptionURL, { width: 200 }, function (error) {
-      if (error) console.error(error);
-    });
+    function copySubscription() {
+      navigator.clipboard.writeText(subscriptionURL).then(() => {
+        notification.style.display = "block";
+        setTimeout(() => {
+          notification.style.display = "none";
+        }, 2000);
+      });
+    }
+
+    QRCode.toCanvas(
+      document.getElementById("qrcode"),
+      subscriptionURL,
+      { width: 200, color: { dark: "#00adb5", light: "#1e1e2f" } },
+      function (err) {
+        if (err) console.error(err);
+      }
+    );
 
     loadServers();
   </script>
