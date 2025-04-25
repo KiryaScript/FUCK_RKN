@@ -49,7 +49,6 @@
       font-size: 36px;
       color: #00adb5;
       margin-bottom: 20px;
-      animation: glitch 1s linear infinite;
     }
 
     .stats {
@@ -108,38 +107,10 @@
       margin-top: 10px;
     }
 
-    @keyframes glitch {
-      0% {
-        text-shadow: 1px 0 red, -1px 0 blue;
-        transform: translate(0);
-      }
-      20% {
-        text-shadow: -1px 0 red, 1px 0 blue;
-        transform: translate(-1px, 0);
-      }
-      40% {
-        text-shadow: 1px 0 red, -1px 0 blue;
-        transform: translate(1px, 0);
-      }
-      60% {
-        text-shadow: -1px 0 red, 1px 0 blue;
-        transform: translate(-1px, 0);
-      }
-      80% {
-        text-shadow: 1px 0 red, -1px 0 blue;
-        transform: translate(1px, 0);
-      }
-      100% {
-        text-shadow: 1px 0 red, -1px 0 blue;
-        transform: translate(0);
-      }
-    }
-
     @keyframes fade {
       0% { opacity: 1; }
       100% { opacity: 0; display: none; }
     }
-
   </style>
 </head>
 <body>
@@ -196,16 +167,26 @@
 
     loadServers();
 
-    // Анимация для вкладки
-    let titles = ["FUCK РКН", "РКН сосёт", "Рот ебли блокировки", "FUCK РКН"];
-    let titleIndex = 0;
+    // Эффект глитча в названии вкладки
+    const originalTitle = "FUCK РКН";
+    const glitchTitle = "▓▓▒▒▒▓▓▓▒▒▓▓▒▒▓▓▓▒▒▓▒▒▓▓▓▓▓▒▒▓▒▒▒▒▓▓▒▒▓▓▒▒▓▓▓▒▒▓▒▓▓▒▒";
+    let glitchIndex = 0;
 
     function animateTitle() {
-      document.title = titles[titleIndex];
-      titleIndex = (titleIndex + 1) % titles.length;
+      let currentTitle = glitchTitle.substring(0, glitchIndex) + originalTitle.substring(glitchIndex);
+      document.title = currentTitle;
+
+      glitchIndex = (glitchIndex + 1) % glitchTitle.length;
+
+      // Восстановление названия после "глитча"
+      if (glitchIndex === glitchTitle.length) {
+        setTimeout(() => {
+          document.title = originalTitle;
+        }, 2000);  // Название останется нормальным 2 секунды
+      }
     }
 
-    setInterval(animateTitle, 1000); // Периодическая смена названия
+    setInterval(animateTitle, 100); // Обновление каждый 100мс для эффекта
 
   </script>
 
