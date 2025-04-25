@@ -4,23 +4,55 @@
   <meta charset="UTF-8">
   <title>Shadowsocks Панель</title>
   <style>
-    body {
-      background-color: #1e1e2f;
-      color: #e0e0e0;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
       font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+
+    #background {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: -2;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.6); /* 60% затемнение */
+      z-index: -1;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px;
+      justify-content: center;
+      color: #e0e0e0;
+      text-align: center;
+      padding: 20px;
     }
 
     h1 {
+      font-size: 36px;
       color: #00adb5;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
 
     .stats {
-      font-size: 18px;
+      font-size: 20px;
       margin-bottom: 20px;
     }
 
@@ -29,7 +61,7 @@
       color: #fff;
       border: none;
       padding: 10px 20px;
-      margin: 15px 0;
+      margin: 20px 0;
       border-radius: 8px;
       cursor: pointer;
       font-size: 16px;
@@ -47,6 +79,10 @@
       animation: fade 2s ease-out forwards;
     }
 
+    canvas {
+      margin-top: 10px;
+    }
+
     @keyframes fade {
       0% { opacity: 1; }
       100% { opacity: 0; display: none; }
@@ -55,11 +91,18 @@
 </head>
 <body>
 
-  <h1>Shadowsocks Серверы</h1>
-  <div class="stats" id="serverStats">Загрузка...</div>
-  <canvas id="qrcode"></canvas>
-  <button onclick="copySubscription()">Скопировать подписку</button>
-  <div id="notification">Ссылка скопирована!</div>
+  <video id="background" autoplay muted loop playsinline>
+    <source src="background.mp4" type="video/mp4">
+  </video>
+  <div id="overlay"></div>
+
+  <div class="content">
+    <h1>Shadowsocks Серверы</h1>
+    <div class="stats" id="serverStats">Загрузка...</div>
+    <canvas id="qrcode"></canvas>
+    <button onclick="copySubscription()">Скопировать подписку</button>
+    <div id="notification">Ссылка скопирована!</div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script>
@@ -67,54 +110,12 @@
     const statsDiv = document.getElementById("serverStats");
     const notification = document.getElementById("notification");
 
-    let total = 0, online = 0, offline = 0;
-
-    function updateStats() {
-      statsDiv.textContent = `Всего: ${total} | 🟢 Онлайн: ${online} | 🔴 Оффлайн: ${offline}`;
-    }
-
-    function extractIpPort(ssLink) {
-      try {
-        const raw = ssLink.replace("ss://", "").split("#")[0];
-        const decoded = atob(raw);
-        const [ , addr ] = decoded.split("@");
-        const [ip, port] = addr.split(":");
-        return { ip, port };
-      } catch {
-        return { ip: "", port: "" };
-      }
-    }
-
-    function checkOnline(ip, port) {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => resolve(true);
-        img.onerror = () => resolve(false);
-        img.src = `http://${ip}:${port}/favicon.ico?${Date.now()}`;
-        setTimeout(() => resolve(false), 2000);
-      });
-    }
-
     async function loadServers() {
       try {
         const res = await fetch("servers.txt");
         const text = await res.text();
         const lines = text.split("\n").map(l => l.trim()).filter(l => l.startsWith("ss://"));
-        total = lines.length;
-
-        for (const ss of lines) {
-          const { ip, port } = extractIpPort(ss);
-          if (ip && port) {
-            const isOnline = await checkOnline(ip, port);
-            if (isOnline) online++;
-            else offline++;
-            updateStats();
-          } else {
-            offline++;
-            updateStats();
-          }
-        }
-
+        statsDiv.textContent = `Всего серверов: ${lines.length}`;
       } catch (e) {
         statsDiv.textContent = "Не удалось загрузить servers.txt";
         console.error("Ошибка загрузки:", e);
@@ -133,7 +134,7 @@
     QRCode.toCanvas(
       document.getElementById("qrcode"),
       subscriptionURL,
-      { width: 200, color: { dark: "#00adb5", light: "#1e1e2f" } },
+      { width: 200, color: { dark: "#00adb5", light: "#00000000" } },
       function (err) {
         if (err) console.error(err);
       }
