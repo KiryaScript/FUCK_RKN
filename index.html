@@ -4,58 +4,17 @@
   <meta charset="UTF-8">
   <title>FUCK RKN</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body, html {
-      height: 100%;
-      font-family: 'Segoe UI', sans-serif;
-      overflow: hidden;
-    }
-
-    #background {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      z-index: -2;
-    }
-
-    #overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
-      z-index: -1;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body, html { height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+    #background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+    #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: -1; }
     .content {
-      position: relative;
-      z-index: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #e0e0e0;
-      text-align: center;
-      padding: 20px;
+      position: relative; z-index: 1; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: #e0e0e0; text-align: center; padding: 20px;
     }
-
-    h1 {
-      font-size: 36px;
-      color: #00adb5;
-      margin-bottom: 20px;
-    }
-
-    .stats {
-      font-size: 20px;
-      margin-bottom: 20px;
-    }
-
+    h1 { font-size: 36px; color: #00adb5; margin-bottom: 20px; }
+    .stats { font-size: 20px; margin-bottom: 20px; }
     button {
       background-color: #00adb5;
       color: #fff;
@@ -71,25 +30,16 @@
       box-shadow: 0 0 10px #00adb5, 0 0 20px #00adb5;
       transition: transform 0.2s, box-shadow 0.2s;
     }
-
-    button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px #00ffc3, 0 0 30px #00ffc3;
-    }
-
+    button:hover { transform: scale(1.05); box-shadow: 0 0 15px #00ffc3, 0 0 30px #00ffc3; }
     #notification {
       color: #4caf50;
       margin-top: 10px;
       display: none;
       animation: fade 2s ease-out forwards;
     }
-
     #telegram-link {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 40px;
-      height: 40px;
+      position: fixed; bottom: 20px; right: 20px;
+      width: 40px; height: 40px;
       background-color: #0088cc;
       border-radius: 50%;
       padding: 8px;
@@ -97,27 +47,13 @@
       z-index: 10;
       transition: transform 0.2s;
     }
-
-    #telegram-link:hover {
-      transform: scale(1.1);
-    }
-
-    #telegram-link img {
-      width: 100%;
-      height: 100%;
-      filter: invert(1);
-    }
-
-    canvas {
-      margin-top: 10px;
-    }
-
-    @keyframes fade {
-      0% { opacity: 1; }
-      100% { opacity: 0; display: none; }
-    }
+    #telegram-link:hover { transform: scale(1.1); }
+    #telegram-link img { width: 100%; height: 100%; filter: invert(1); }
+    canvas { margin-top: 10px; }
+    @keyframes fade { 0% { opacity: 1; } 100% { opacity: 0; display: none; } }
   </style>
 </head>
+
 <body>
 
   <video id="background" autoplay muted loop playsinline>
@@ -137,6 +73,19 @@
     <button onclick="window.open('https://github.com/KiryaScript/FUCK_RKN/releases/download/neko/nekoray.7z', '_blank')">
       🐱 Скачать Nekoray
     </button>
+
+
+
+
+    <!-- НОВЫЕ КНОПКИ ГАЙДОВ -->
+    <button onclick="openGuide('https://telegra.ph/Instrukciya-po-podklyucheniyu-VPN-Vless-i-ShadowSocks-dlya-IPhone-04-26')">
+      🖥 Гайд для IPhone
+    </button>
+
+    <button onclick="openGuide('https://telegra.ph/Instrukciya-po-podklyucheniyu-ShadowSocks-dlya-Android-04-26')">
+      📱 Гайд для Android
+    </button>
+    <!-- КОНЕЦ НОВЫХ КНОПОК -->
 
     <div id="notification">Ссылка скопирована!</div>
   </div>
@@ -175,9 +124,7 @@
     function copySubscription() {
       navigator.clipboard.writeText(subscriptionURL).then(() => {
         notification.style.display = "block";
-        setTimeout(() => {
-          notification.style.display = "none";
-        }, 2000);
+        setTimeout(() => { notification.style.display = "none"; }, 2000);
       });
     }
 
@@ -224,6 +171,11 @@
     }
 
     glitchTitle();
+
+    // Скрипт для открытия гайдов
+    function openGuide(url) {
+      window.open(url, '_blank');
+    }
   </script>
 
   <a href="https://t.me/devjijlk" target="_blank" id="telegram-link" title="Мой Telegram">
