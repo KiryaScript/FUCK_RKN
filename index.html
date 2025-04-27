@@ -15,6 +15,15 @@
     }
     h1 { font-size: 36px; color: #00adb5; margin-bottom: 20px; }
     .stats { font-size: 20px; margin-bottom: 20px; }
+    #progressBarContainer {
+      width: 80%; background: #333; border-radius: 10px; margin-bottom: 20px; overflow: hidden;
+      box-shadow: 0 0 10px #00adb5;
+    }
+    #progressBar {
+      height: 10px; width: 0%;
+      background: linear-gradient(90deg, #00adb5, #00ffc3);
+      transition: width 1s;
+    }
     button {
       background-color: #00adb5;
       color: #fff;
@@ -49,7 +58,6 @@
     }
     #telegram-link:hover { transform: scale(1.1); }
     #telegram-link img { width: 100%; height: 100%; filter: invert(1); }
-    canvas { margin-top: 10px; }
     @keyframes fade { 0% { opacity: 1; } 100% { opacity: 0; display: none; } }
   </style>
 </head>
@@ -63,8 +71,16 @@
 
   <div class="content">
     <h1>FUCK РКН</h1>
+
+    <div id="progressBarContainer">
+      <div id="progressBar"></div>
+    </div>
+    
     <div class="stats" id="serverStats">Загрузка...</div>
-    <canvas id="qrcode"></canvas>
+
+    <div style="background: white; padding: 10px; border-radius: 12px; display: inline-block;">
+      <canvas id="qrcode"></canvas>
+    </div>
 
     <button onclick="copySubscription()">
       📋 Скопировать подписку
@@ -74,18 +90,14 @@
       🐱 Скачать Nekoray
     </button>
 
-
-
-
-    <!-- НОВЫЕ КНОПКИ ГАЙДОВ -->
+    <!-- КНОПКИ ГАЙДОВ -->
     <button onclick="openGuide('https://telegra.ph/Instrukciya-po-podklyucheniyu-VPN-Vless-i-ShadowSocks-dlya-IPhone-04-26')">
-      🖥 Гайд для IPhone
+      🖥 Гайд для iPhone
     </button>
 
     <button onclick="openGuide('https://telegra.ph/Instrukciya-po-podklyucheniyu-ShadowSocks-dlya-Android-04-26')">
       📱 Гайд для Android
     </button>
-    <!-- КОНЕЦ НОВЫХ КНОПОК -->
 
     <div id="notification">Ссылка скопирована!</div>
   </div>
@@ -108,6 +120,7 @@
     const subscriptionURL = "https://kiryascript.github.io/FUCK_RKN/subscription.txt";
     const statsDiv = document.getElementById("serverStats");
     const notification = document.getElementById("notification");
+    const progressBar = document.getElementById("progressBar");
 
     async function loadServers() {
       try {
@@ -115,10 +128,16 @@
         const text = await res.text();
         const lines = text.split("\n").map(l => l.trim()).filter(l => l.startsWith("ss://"));
         statsDiv.textContent = `Живчики: ${lines.length}`;
+        animateProgress(lines.length);
       } catch (e) {
         statsDiv.textContent = "Не удалось загрузить servers.txt";
         console.error("Ошибка загрузки:", e);
       }
+    }
+
+    function animateProgress(count) {
+      let percent = Math.min(100, count); // Максимум 100%
+      progressBar.style.width = percent + "%";
     }
 
     function copySubscription() {
@@ -131,7 +150,13 @@
     QRCode.toCanvas(
       document.getElementById("qrcode"),
       subscriptionURL,
-      { width: 200, color: { dark: "#00adb5", light: "#00000000" } },
+      {
+        width: 200,
+        color: {
+          dark: "#000000",
+          light: "#00000000"
+        }
+      },
       function (err) {
         if (err) console.error(err);
       }
@@ -172,10 +197,19 @@
 
     glitchTitle();
 
-    // Скрипт для открытия гайдов
+    // Открытие гайдов
     function openGuide(url) {
       window.open(url, '_blank');
     }
+
+    // Пасхалка: если 5 раз кликнуть на заголовок
+    let clickCount = 0;
+    document.querySelector("h1").addEventListener("click", () => {
+      clickCount++;
+      if (clickCount === 5) {
+        alert("🔥 В госдуме работают ебанные бляди))))");
+      }
+    });
   </script>
 
   <a href="https://t.me/devjijlk" target="_blank" id="telegram-link" title="Мой Telegram">
