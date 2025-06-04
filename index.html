@@ -112,7 +112,7 @@
 
 <body>
   <video id="background" autoplay muted loop playsinline>
-    <source src="background.mp4" type="video/mp4">
+    <source id="videoSource" src="background.mp4" type="video/mp4">
   </video>
   <div id="overlay"></div>
 
@@ -124,41 +124,23 @@
 
   <div class="content">
     <h1>FUCK РКН</h1>
-
-    <div id="progressBarContainer">
-      <div id="progressBar"></div>
-    </div>
-    
+    <div id="progressBarContainer"><div id="progressBar"></div></div>
     <div class="stats" id="serverStats">Загрузка...</div>
 
     <div style="background: white; padding: 10px; border-radius: 12px; display: inline-block;">
       <canvas id="qrcode"></canvas>
     </div>
 
-    <button onclick="copySubscription()">
-      📋 Скопировать подписку
-    </button>
-
-    <button onclick="window.open('https://github.com/KiryaScript/FUCK_RKN/releases/download/neko/nekoray.7z', '_blank')">
-      🐱 Скачать Nekoray
-    </button>
-
-    <!-- КНОПКИ ГАЙДОВ -->
-    <button onclick="openGuide('https://telegra.ph/Instrukciya-po-podklyucheniyu-VPN-Vless-i-ShadowSocks-dlya-IPhone-04-26')">
-      🖥 Гайд для iPhone
-    </button>
-
-    <button onclick="openGuide('https://telegra.ph/Instrukciya-po-podklyucheniyu-ShadowSocks-dlya-Android-04-26')">
-      📱 Гайд для Android
-    </button>
+    <button onclick="copySubscription()">📋 Скопировать подписку</button>
+    <button onclick="window.open('https://github.com/KiryaScript/FUCK_RKN/releases/download/neko/nekoray.7z', '_blank')">🐱 Скачать Nekoray</button>
+    <button onclick="openGuide('https://telegra.ph/Instrukciya-po-podklyucheniyu-VPN-Vless-i-ShadowSocks-dlya-IPhone-04-26')">🖥 Гайд для iPhone</button>
+    <button onclick="openGuide('https://telegra.ph/Instrukciya-po-podklyucheniyu-ShadowSocks-dlya-Android-04-26')">📱 Гайд для Android</button>
 
     <div id="notification">Ссылка скопирована!</div>
 
     <div class="discord-widget">
       <iframe src="https://discord.com/widget?id=1379713636775497808&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-      <button class="discord-invite-button" onclick="window.open('https://discord.gg/3XRx8Etguh', '_blank')">
-        📩 Резерв ссылка
-      </button>
+      <button class="discord-invite-button" onclick="window.open('https://discord.gg/3XRx8Etguh', '_blank')">📩 Резерв ссылка</button>
     </div>
   </div>
 
@@ -201,7 +183,7 @@
     }
 
     function animateProgress(count) {
-      let percent = Math.min(100, count); // Максимум 100%
+      let percent = Math.min(100, count);
       progressBar.style.width = percent + "%";
     }
 
@@ -229,7 +211,43 @@
 
     loadServers();
 
-    // Глитч эффект для заголовка вкладки
+    // Случайная подмена фонового видео (30% шанс)
+    const videoList = [
+      "background.mp4",
+      "backgrounds/bg1.mp4",
+      "backgrounds/bg2.mp4",
+      "backgrounds/bg3.mp4",
+      "backgrounds/bg4.mp4",
+      "backgrounds/bg5.mp4",
+      "backgrounds/bg6.mp4",
+      "backgrounds/bg7.mp4",
+      "backgrounds/bg8.mp4",
+      "backgrounds/bg9.mp4",
+      "backgrounds/bg10.mp4",
+      "backgrounds/bg11.mp4",
+      "backgrounds/bg12.mp4",
+      "backgrounds/bg13.mp4",
+      "backgrounds/bg14.mp4",
+      "backgrounds/bg15.mp4",
+      "backgrounds/bg16.mp4",
+      "backgrounds/bg17.mp4"
+    ];
+
+    function pickRandomVideoWithChance() {
+      const chance = 0.3;
+      let selected = videoList[0];
+      if (Math.random() < chance) {
+        const alternatives = videoList.slice(1);
+        selected = alternatives[Math.floor(Math.random() * alternatives.length)];
+      }
+      const source = document.getElementById("videoSource");
+      source.src = selected;
+      document.getElementById("background").load();
+    }
+
+    pickRandomVideoWithChance();
+
+    // Заголовок с глитчем
     const fullTitle = "FUCK RKN";
     const symbols = "!@#$%^&*()_+[]{}|;:,.<>?/~`1234567890";
     let visible = true;
@@ -238,15 +256,10 @@
       const duration = 2000;
       const steps = 20;
       let step = 0;
-
       const interval = setInterval(() => {
         let glitched = "";
         for (let i = 0; i < fullTitle.length; i++) {
-          if (step >= steps) {
-            glitched += fullTitle[i];
-          } else {
-            glitched += symbols[Math.floor(Math.random() * symbols.length)];
-          }
+          glitched += step >= steps ? fullTitle[i] : symbols[Math.floor(Math.random() * symbols.length)];
         }
         document.title = glitched;
         step++;
@@ -262,12 +275,10 @@
 
     glitchTitle();
 
-    // Открытие гайдов
     function openGuide(url) {
       window.open(url, '_blank');
     }
 
-    // Пасхалка: если 5 раз кликнуть на заголовок
     let clickCount = 0;
     document.querySelector("h1").addEventListener("click", () => {
       clickCount++;
@@ -276,7 +287,6 @@
       }
     });
 
-    // Интерактивный фон
     const overlay = document.getElementById('overlay');
     document.addEventListener('mousemove', (e) => {
       const x = e.clientX;
@@ -287,9 +297,8 @@
       overlay.style.background = 'rgba(0, 0, 0, 0.6)';
     });
 
-    // Фоновая музыка
     const audio = document.getElementById('backgroundMusic');
-    audio.volume = 0.05; // Громкость 10%
+    audio.volume = 0.05;
     let isPlaying = true;
     audio.play().catch(() => {
       isPlaying = false;
@@ -311,6 +320,5 @@
   <a href="https://t.me/devjijlk" target="_blank" id="telegram-link" title="Мой Telegram">
     <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/telegram.svg" alt="Telegram" />
   </a>
-
 </body>
 </html>
