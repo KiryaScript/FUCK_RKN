@@ -19,7 +19,7 @@
       display: flex; flex-direction: column; align-items: center; gap: 10px;
     }
     .discord-invite-button {
-      background-color: #7289da; /* Цвет Discord */
+      background-color: #7289da;
       color: #fff;
       border: none;
       padding: 10px 20px;
@@ -81,13 +81,29 @@
     }
     #telegram-link:hover { transform: scale(1.1); }
     #telegram-link img { width: 100%; height: 100%; filter: invert(1); }
+    .chat-container {
+      position: fixed; bottom: 160px; left: 20px; z-index: 10;
+      background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 8px;
+      max-width: 300px; color: #e0e0e0;
+    }
+    #chatMessages { max-height: 150px; overflow-y: auto; margin-bottom: 10px; }
+    #chatInput { width: 100%; padding: 5px; border-radius: 5px; border: none; background: #333; color: #e0e0e0; }
+    #musicToggle {
+      position: fixed; top: 20px; left: 20px; z-index: 10;
+      background-color: #00adb5; box-shadow: 0 0 10px #00adb5, 0 0 20px #00adb5;
+    }
+    #musicToggle:hover { box-shadow: 0 0 15px #00ffc3, 0 0 30px #00ffc3; }
     @media (max-width: 800px) {
       .discord-widget {
         position: static; width: 100%; max-width: 350px; padding: 10px;
         margin: 0 auto;
       }
       .content {
-        padding-bottom: 560px; /* Учитываем высоту виджета + кнопки */
+        padding-bottom: 560px;
+      }
+      .chat-container {
+        bottom: 220px;
+        max-width: 90%;
       }
     }
     @keyframes fade { 0% { opacity: 1; } 100% { opacity: 0; display: none; } }
@@ -99,6 +115,12 @@
     <source src="background.mp4" type="video/mp4">
   </video>
   <div id="overlay"></div>
+
+  <audio id="backgroundMusic" loop autoplay>
+    <source src="background-music.mp3" type="audio/mp3">
+  </audio>
+
+  <button id="musicToggle">🔇 Выкл музыку</button>
 
   <div class="content">
     <h1>FUCK РКН</h1>
@@ -135,9 +157,14 @@
     <div class="discord-widget">
       <iframe src="https://discord.com/widget?id=1379713636775497808&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
       <button class="discord-invite-button" onclick="window.open('https://discord.gg/3XRx8Etguh', '_blank')">
-        📩 Резерв ссылка на Дискорд
+        📩 Резерв ссылка
       </button>
     </div>
+  </div>
+
+  <div class="chat-container">
+    <div id="chatMessages"></div>
+    <input id="chatInput" type="text" placeholder="Напиши сообщение...">
   </div>
 
   <div style="position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 10;">
@@ -246,6 +273,37 @@
       clickCount++;
       if (clickCount === 5) {
         alert("🔥 В госдуме работают ебанные бляди))))");
+      }
+    });
+
+    // Интерактивный фон
+    const overlay = document.getElementById('overlay');
+    document.addEventListener('mousemove', (e) => {
+      const x = e.clientX;
+      const y = e.clientY;
+      overlay.style.background = `radial-gradient(circle 100px at ${x}px ${y}px, rgba(0, 173, 181, 0.3), rgba(0, 0, 0, 0.6))`;
+    });
+    document.addEventListener('mouseleave', () => {
+      overlay.style.background = 'rgba(0, 0, 0, 0.6)';
+    });
+
+    // Фоновая музыка
+    const audio = document.getElementById('backgroundMusic');
+    audio.volume = 0.05; // Громкость 10%
+    let isPlaying = true;
+    audio.play().catch(() => {
+      isPlaying = false;
+      document.getElementById('musicToggle').textContent = '🎵 Вкл музыку';
+    });
+    const musicToggle = document.getElementById('musicToggle');
+    musicToggle.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      if (isPlaying) {
+        audio.play();
+        musicToggle.textContent = '🔇 Выкл музыку';
+      } else {
+        audio.pause();
+        musicToggle.textContent = '🎵 Вкл музыку';
       }
     });
   </script>
