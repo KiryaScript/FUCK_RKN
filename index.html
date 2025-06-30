@@ -81,13 +81,6 @@
     }
     #telegram-link:hover { transform: scale(1.1); }
     #telegram-link img { width: 100%; height: 100%; filter: invert(1); }
-    .chat-container {
-      position: fixed; bottom: 160px; left: 20px; z-index: 10;
-      background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 8px;
-      max-width: 300px; color: #e0e0e0;
-    }
-    #chatMessages { max-height: 150px; overflow-y: auto; margin-bottom: 10px; }
-    #chatInput { width: 100%; padding: 5px; border-radius: 5px; border: none; background: #333; color: #e0e0e0; }
     #musicToggle {
       position: fixed; top: 20px; left: 20px; z-index: 10;
       background-color: #00adb5; box-shadow: 0 0 10px #00adb5, 0 0 20px #00adb5;
@@ -100,10 +93,6 @@
       }
       .content {
         padding-bottom: 560px;
-      }
-      .chat-container {
-        bottom: 220px;
-        max-width: 90%;
       }
     }
     @keyframes fade { 0% { opacity: 1; } 100% { opacity: 0; display: none; } }
@@ -144,11 +133,6 @@
     </div>
   </div>
 
-  <div class="chat-container">
-    <div id="chatMessages"></div>
-    <input id="chatInput" type="text" placeholder="Напиши сообщение...">
-  </div>
-
   <div style="position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 10;">
     <button onclick="window.open('https://github.com/KiryaScript/discord-fix-app', '_blank')"
             style="background-color: #00adb5; color: white; border: none; padding: 10px 20px; border-radius: 8px;
@@ -159,6 +143,11 @@
             style="background-color: #00adb5; color: white; border: none; padding: 10px 20px; border-radius: 8px;
                    cursor: pointer; box-shadow: 0 0 10px #00adb5, 0 0 20px #00adb5; font-size: 14px;">
       🛠 Discord/Youtube Fix ALT
+    </button>
+    <button onclick="window.open('https://ai-chat-cloudflare-host.devikteam.workers.dev/', '_blank')"
+            style="background-color: #00adb5; color: white; border: none; padding: 10px 20px; border-radius: 8px;
+                   cursor: pointer; box-shadow: 0 0 10px #00adb5, 0 0 20px #00adb5; font-size: 14px;">
+      🌐 FCK AI Chat
     </button>
   </div>
 
@@ -258,7 +247,7 @@
       const interval = setInterval(() => {
         let glitched = "";
         for (let i = 0; i < fullTitle.length; i++) {
-          glitched += step >= steps ? fullTitle[i] : symbols[Math.floor(Math.random() * symbols.length)];
+          glitched += step >= steps ? fullTitle[i] : itches[Math.floor(Math.random() * symbols.length)];
         }
         document.title = glitched;
         step++;
@@ -290,8 +279,9 @@
     document.addEventListener('mousemove', (e) => {
       const x = e.clientX;
       const y = e.clientY;
-      overlay.style.background = `radial-gradient(circle 100px at ${x}px ${y}px, rgba(0, 173, 181, 0.3), rgba(0, 0, 0, 0.6))`;
+      overlay.style.background = `radial-gradient(circle 100px at ${x}px ${y}px, rgba(0, 173, 181, 039), rgba(0, 0, 0, 0.6))`;
     });
+ بهبود
     document.addEventListener('mouseleave', () => {
       overlay.style.background = 'rgba(0, 0, 0, 0.6)';
     });
